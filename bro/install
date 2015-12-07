@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+set -e
+set -x
+
+readonly PACKAGE_NAME=bro
+readonly SETUP_DIR=/tmp/setup
+readonly BRO_DB_DIR=/usr/share/GeoIP
+
+prepare() {
+    echo "preparing package $PACKAGE_NAME"
+
+    echo "Installing Dependencies"
+    apt-get -y install cmake make gcc g++ flex bison libpcap-dev libssl-dev python-dev swig zlib1g-dev libgeoip-dev
+
+    install_geoip
+}
+
+# https://www.bro.org/sphinx/frameworks/geoip.html#geolocation
+install_geoip() {
+
+
+    # Download Source files
+    cd "$SETUP_DIR"
+    wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz
+    gunzip GeoLiteCity.dat.gz
+
+    mkdir -p "$BRO_DB_DIR"
+    mv GeoLiteCity.dat "$BRO_DB_DIR"/GeoIPCity.dat
+}
+
+#Install the actual package
+# https://www.bro.org/sphinx/install/install.html
+install() {
+    echo "installing package $PACKAGE_NAME"
+    cd "$SETUP_DIR"
+    git clone --recursive git://git.bro.org/bro
+    cd bro
+    ./configure
+    make
+    make install
+
+}
+
+#Configure package
+setup() {
+    echo "configuring package $PACKAGE_NAME"
+    echo "TODO: No configuration put in place at this point."
+}
+
+main() {
+    prepare
+    install
+    setup
+}
+
+main
