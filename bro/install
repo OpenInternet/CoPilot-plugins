@@ -5,6 +5,7 @@ set -x
 
 readonly PACKAGE_NAME=bro
 readonly SETUP_DIR=/tmp/setup
+readonly BRO_DIR=/opt/bro
 
 prepare() {
     echo "preparing package $PACKAGE_NAME"
@@ -21,10 +22,14 @@ install() {
     cd "$SETUP_DIR"
     git clone --recursive git://git.bro.org/bro
     cd bro
-    ./configure
+    # We don't want the development version
+    # The 2.4 version works in testing.
+    git checkout release/2.4
+    git submodule update --recursive --init
+    # We want to install bro in a known directory
+    ./configure --prefix="$BRO_DIR"
     make
     make install
-
 }
 
 #Configure package
