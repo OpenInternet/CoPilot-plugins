@@ -35,7 +35,39 @@ install() {
 #Configure package
 setup() {
     echo "configuring package $PACKAGE_NAME"
-    echo "TODO: No configuration put in place at this point."
+    # broctl.cfg  configuration
+    reduce_logging
+    disable_mail
+
+    # networks.cfg configuration
+    define_local_networks
+
+    # node.cfg configuration
+    # No configuration since it defaults to eth0
+    # This will need to be configured if we add Wi-Fi Bridging
+}
+
+define_local_networks() {
+    # Rewrite the local networks config file
+    # 192.168.12.0/24 is the default create_ap local network space.
+    echo '192.168.12.0/24      Private IP Space' > "$BRO_DIR/etc/networks.cfg"
+}
+
+disable_mail() {
+    sed -i 's/^MailHostUpDown.*/MailHostUpDown = 0/' "$BRO_DIR/etc/broctl.cfg"
+    sed -i 's/^MinDiskSpace.*/MinDiskSpace = 0/' "$BRO_DIR/etc/broctl.cfg"
+    sed -i 's/^MailConnectionSummary.*/MailConnectionSummary = 0/' "$BRO_DIR/etc/broctl.cfg"
+}
+
+reduce_logging() {
+    # Logging
+    sed -i 's/^LogRotationInterval.*/LogRotationInterval = 600/' "$BRO_DIR/etc/broctl.cfg"
+    sed -i 's/^LogExpireInterval.*/LogExpireInterval = 1/' "$BRO_DIR/etc/broctl.cfg"
+
+    # Stats logging
+    sed -i 's/^StatsLogEnable.*/StatsLogEnable = 0/' "$BRO_DIR/etc/broctl.cfg"
+    # In case we ever decide to enable stats logging I still want it to expire
+    sed -i 's/^StatsLogExpireInterval.*/StatsLogExpireInterval = 1/' "$BRO_DIR/etc/broctl.cfg"
 }
 
 main() {
