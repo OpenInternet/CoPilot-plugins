@@ -10,7 +10,7 @@ prepare() {
     echo "preparing package $PACKAGE_NAME"
     mkdir -p "$SETUP_DIR"
     echo "Installing Dependencies"
-    apt-get -y install cmake make gcc g++ flex bison libpcap-dev libssl-dev python-dev swig zlib1g-dev libgeoip-dev
+    apt-get -y install cmake make gcc g++ flex bison libpcap-dev libssl-dev python-dev swig zlib1g-dev
 }
 
 
