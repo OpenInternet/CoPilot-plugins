@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+set -e
+set -x
+
+readonly PACKAGE_NAME="suricata"
+
+#Install some dependencies, etc
+prepare() {
+    echo "preparing package $PACKAGE_NAME"
+}
+
+#Install the actual package
+install() {
+    echo "installing package $PACKAGE_NAME"
+    apt-get install suricata
+
+    # TODO (Still needed?)
+    # Python Yaml is needed for parsing the config files in setup
+    # apt-get install python-yaml
+}
+
+#Configure package
+setup() {
+    # https://redmine.openinfosecfoundation.org/projects/suricata/wiki/Setting_up_IPSinline_for_Linux
+    # https://scadasecurity636.wordpress.com/2014/07/10/the-suricata-ips-mode-and-iptables/
+    echo "configuring package $PACKAGE_NAME"
+    update_config_files
+}
+
+update_config_files() {
+    # Copy custom suricata config file over.
+    cp ./suricata.yaml /etc/suricata/copilot_norules.conf.yaml
+
+    # Change suricata main config file to have default conf point at copilot_norules.conf
+    sed -i 's/^SURCONF.*/SURCONF=\/etc\/suricata\/copilot_norules\.conf/' "/etc/default/suricata"
+
+    # Set the listen mode to nfqueue fot IPS mode
+    sed -i 's/^LISTENMODE.*/LISTENMODE=nfqueue/' "/etc/default/suricata"
+}
+
+
+main() {
+    prepare
+    install
+    setup
+}
+
+main
