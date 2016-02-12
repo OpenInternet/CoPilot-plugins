@@ -5,11 +5,11 @@ readonly SURICATA_RULES="/tmp/copilot/copilot-suricata.rules"
 #readonly SURICATA_EMPTY="/etc/suricata/copilot_norules.conf"
 
 start_suricata() {
-    if [[ -e "$SURICATA_RULES" ]]; then
+    if [[ -e "$IPTABLE_RULE" ]]; then
         echo "Starting example configuration"
         iptables -N ${IPTABLE_TABLE}
         iptables -I ${IPTABLE_RULE}
-        suricata -q 0 -c "$SURICATA_RULES"
+        suricata -q 0 -c "$SURICATA_RULEs"
     else
         echo "Not starting Suricata"
         #suricata -c "$SURICATA_EMPTY"
