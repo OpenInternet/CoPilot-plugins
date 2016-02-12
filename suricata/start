@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
-
-readonly IPTABLE_RULE='FORWARD -j NFQUEUE'
+readonly IPTABLE_TABLE='NFQUEUE'
+readonly IPTABLE_RULE="FORWARD -j $IPTABLE_TABLE"
 readonly SURICATA_RULES="/tmp/copilot/copilot-suricata.rules"
 #readonly SURICATA_EMPTY="/etc/suricata/copilot_norules.conf"
 
 start_suricata() {
-    if [[ -e "$SURICATA_CONF" ]]; then
+    if [[ -e "$SURICATA_RULES" ]]; then
         echo "Starting example configuration"
+        iptables -N ${IPTABLE_TABLE}
         iptables -I ${IPTABLE_RULE}
         suricata -q 0 -c "$SURICATA_RULES"
     else
