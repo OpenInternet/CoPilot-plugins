@@ -1,21 +1,21 @@
 #!/usr/bin/env bash
 
-set +x
+#set +x
 
-readonly IPTABLE_TABLE='NFQUEUE'
-readonly IPTABLE_RULE="FORWARD -j $IPTABLE_TABLE"
+readonly IPTABLE_RULE="FORWARD -j NFQUEUE"
 readonly SURICATA_RULES="/tmp/copilot/copilot-suricata.rules"
 #readonly SURICATA_EMPTY="/etc/suricata/copilot_norules.conf"
 
 start_suricata() {
-    if [[ -e "$IPTABLE_RULE" ]]; then
+    if [[ -e "$SURICATA_RULES" ]]; then
         echo "Starting example configuration"
-        iptables -N ${IPTABLE_TABLE}
         iptables -I ${IPTABLE_RULE}
         suricata -q 0 -c "$SURICATA_RULEs"
     else
-        echo "Not starting Suricata"
+        echo "No Rule file found. Not starting Suricata"
         #suricata -c "$SURICATA_EMPTY"
+        echo "Ignore the upcoming error message from iptables"
+        echo "We didn't create a rule, so it will not be able to delete one."
     fi
 }
 
