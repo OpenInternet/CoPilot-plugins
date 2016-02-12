@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+
+set +x
+
 readonly IPTABLE_TABLE='NFQUEUE'
 readonly IPTABLE_RULE="FORWARD -j $IPTABLE_TABLE"
 readonly SURICATA_RULES="/tmp/copilot/copilot-suricata.rules"
