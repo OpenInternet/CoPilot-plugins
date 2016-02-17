@@ -43,28 +43,27 @@ class ConfigWriter(Config):
 
     def add_rule(self, ap_name="copilot", ap_password="copilot_pass", iface_in="eth0", iface_out=None):
         if not iface_out:
-            iface_out = get_wireless_interface()
+            iface_out = self.get_wireless_interface()
         log.debug("adding create ap rule  {0} {1} {2} {3}".format(iface_out, iface_in, ap_name, ap_password))
         self._rules.append("{0} ".format(iface_out))
         self._rules.append("{0} ".format(iface_in))
         self._rules.append("{0} ".format(ap_name))
         self._rules.append("{0} ".format(ap_password))
 
-    def get_wireless_interface():
+    def get_wireless_interface(self):
         iface_out = None
-        name_regex = get_interface_regex("wlan")
+        name_regex = self.get_interface_regex("wlan")
         try:
             iface_out = self.get_proc_wifi_interface(name_regex)
         except RuntimeError:
             iface_out = self.get_sys_wifi_interface(name_regex)
-        if iface_out = None:
+        if iface_out == None:
             raise RuntimeError("Unable to identify wireless interface.")
         else:
             return iface_out
 
-    def get_interface_regex(interface_type):
+    def get_interface_regex(self, interface_type):
         """ Get a interface regex
-
 
         Per: https://github.com/systemd/systemd/blob/5031c4e21b4379c1824033be675517978090fd36/src/udev/udev-builtin-net_id.c#L20
 
@@ -75,7 +74,6 @@ class ConfigWriter(Config):
         Args:
             interface_type (string):
                 acceptable values = [eth, serial, wlan, wwan]
-
         """
 
         interface_prefixes = {"eth":"en", "serial":"sl",
