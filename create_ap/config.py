@@ -42,6 +42,7 @@ class ConfigWriter(Config):
             raise ValueError("Access Point names must be between 1 and 31 characters long.")
 
     def add_rule(self, ap_name="copilot", ap_password="copilot_pass", iface_in="eth0", iface_out=None):
+        log.info("Adding access point configuration")
         if not iface_out:
             iface_out = self.get_wireless_interface()
         log.debug("adding create ap rule  {0} {1} {2} {3}".format(iface_out, iface_in, ap_name, ap_password))
@@ -51,6 +52,7 @@ class ConfigWriter(Config):
         self._rules.append("{0} ".format(ap_password))
 
     def get_wireless_interface(self):
+        log.debug("Obtaining wireless interface")
         iface_out = None
         name_regex = self.get_interface_regex("wlan")
         try:
@@ -75,6 +77,7 @@ class ConfigWriter(Config):
             interface_type (string):
                 acceptable values = [eth, serial, wlan, wwan]
         """
+        log.debug("Getting wireless interface regex.")
 
         interface_prefixes = {"eth":"en", "serial":"sl",
                               "wlan":"wl", "wwan":"ww"}
@@ -88,6 +91,7 @@ class ConfigWriter(Config):
         try:
             name_components['prefix'] = interface_prefixes['interface_type']
         except KeyError:
+            log.error("{0} is an invalid interface type.".format(interface_type))
             raise ValueError("{0} is an invalid interface prefix.".format(interface_type) +
                              "Please use one of the following: {0}".format(interface_prefixes))
         name_components['types'] = "".join(interface_types)
