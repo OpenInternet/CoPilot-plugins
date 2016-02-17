@@ -89,7 +89,7 @@ class ConfigWriter(Config):
             "x"] # MAC
         name_components = {}
         try:
-            name_components['prefix'] = interface_prefixes['interface_type']
+            name_components['prefix'] = interface_prefixes[interface_type]
         except KeyError:
             log.error("{0} is an invalid interface type.".format(interface_type))
             raise ValueError("{0} is an invalid interface prefix.".format(interface_type) +
