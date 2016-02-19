@@ -1,6 +1,8 @@
 from random import randrange
 
 from copilot.models.config import Config
+from uuid import uuid4
+import json
 
 import logging
 log = logging.getLogger(__name__)
@@ -100,10 +102,10 @@ def make_rules(rule_set):
         rule_set (dict): Adversary lab rule sets json translated into a dictionary.
     """
     rules = {}
-    for traffic_type, contents in json_dict.items():
-        name = contents.get("name": str(uuid4())[-12:])
-        flow_name = contents.get("flow_name": str(uuid4())[-12:])
-        byte_sequences = contents.get("byte_sequences": [])
+    for traffic_type, contents in rule_set.items():
+        name = contents.get("name", str(uuid4())[-12:])
+        flow_name = contents.get("flow_name", str(uuid4())[-12:])
+        byte_sequences = contents.get("byte_sequences", [])
 
         for sequence in byte_sequences:
             try:
@@ -113,13 +115,13 @@ def make_rules(rule_set):
                 _outgoing['flow_name'] = flow_name
                 # SID's for rules created here fall in the 1000000-1999999 range.
                 # See: http://doc.emergingthreats.net/bin/view/Main/SidAllocation
-                _outgoing[sid] = int(sequence.get("sid", randrange(1000000,1999999)))
+                _outgoing["sid"] = int(sequence.get("sid", randrange(1000000,1999999)))
 
                 _incoming = {}
                 _incoming['byte_seq'] = ascii_byte_to_socrata_seq(sequence['incoming'])
                 _incoming['name'] = name
                 _incoming['flow_name'] = flow_name
-                _incoming[sid] = int(sequence.get("sid", randrange(1000000,1999999)))
+                _incoming["sid"] = int(sequence.get("sid", randrange(1000000,1999999)))
 
                 # Add the formatted rule pair
                 rules.setdefault(traffic_type, []).append(build_rule_pair(_outgoing, _incoming))
