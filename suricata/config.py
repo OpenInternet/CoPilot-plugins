@@ -136,9 +136,11 @@ def make_rules(rule_set):
 class ConfigWriter(Config):
 
     def __init__(self):
+        log.debug("Creating Suricata Plugin Object.")
         super(ConfigWriter, self).__init__()
-        # TODO Remove hard coded path here.
-        self.rule_path = "/home/www/copilot/copilot/plugins/suricata/byte_dict.json"
+        plugin_dir = os.environ['COPILOT_PLUGINS_DIRECTORY']
+        self..rule_path = os.path.abspath(os.path.join(plugin_dir,
+                                                       "plugins/suricata/byte_dict.json"))
         self.load_rules()
         self.header = ("# This Suricata rules file is AUTOMATICALLY GENERATED.\n" +
                        "# This file was created by the copilot suricata plugin.\n" +
@@ -147,10 +149,12 @@ class ConfigWriter(Config):
         log.info("Suricata config writer loaded.")
 
     def load_rules(self):
+        log.debug("Loading Suricata rules")
         json_data = get_json(self.rule_path)
         self.suricata_rules = make_rules(json_data)
 
     def add_rule(self, rule):
+        log.debug("Adding Suricata rule")
         target = rule[1]
         if target in self.suricata_rules:
             log.debug("adding rule to reject {0}.".format(rule))
