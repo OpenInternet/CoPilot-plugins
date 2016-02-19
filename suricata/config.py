@@ -142,6 +142,7 @@ class ConfigWriter(Config):
     def __init__(self):
         log.debug("Creating Suricata Plugin Object.")
         super(ConfigWriter, self).__init__()
+        self.config_type = "suricata"
         plugin_dir = os.environ['COPILOT_PLUGINS_DIRECTORY']
         self.rule_path = os.path.abspath(os.path.join(plugin_dir,
                                                        "plugins/suricata/byte_dict.json"))
