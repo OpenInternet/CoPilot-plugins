@@ -151,6 +151,7 @@ class ConfigWriter(Config):
                        "# This file was created by the copilot suricata plugin.\n" +
                        "# Edits to this file will be overwritten without notice.\n" +
                        "# This file is created and deleted as needed.\n")
+        log.debug("header of type {0}".format(type(self.header)))
         log.info("Suricata config writer loaded.")
 
     def load_rules(self):
@@ -168,6 +169,7 @@ class ConfigWriter(Config):
             log.debug("rule to reject {0} not found.".format(rule))
 
     def write_rule(self, config_file, rule_set):
+        log.debug("Writing Rules")
         log.debug("Starting to write rule pair {0}".format(rule_set))
         for rule in rule_set:
             log.debug("writing rule {0} to the config file.".format(rule))
