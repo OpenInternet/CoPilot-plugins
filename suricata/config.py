@@ -139,7 +139,7 @@ class ConfigWriter(Config):
         log.debug("Creating Suricata Plugin Object.")
         super(ConfigWriter, self).__init__()
         plugin_dir = os.environ['COPILOT_PLUGINS_DIRECTORY']
-        self..rule_path = os.path.abspath(os.path.join(plugin_dir,
+        self.rule_path = os.path.abspath(os.path.join(plugin_dir,
                                                        "plugins/suricata/byte_dict.json"))
         self.load_rules()
         self.header = ("# This Suricata rules file is AUTOMATICALLY GENERATED.\n" +
