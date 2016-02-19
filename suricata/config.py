@@ -88,7 +88,11 @@ def build_rule_pair(out_rule, in_rule):
 def get_json(json_path):
     """Get json data from a file."""
     with open(json_path, "r") as json_file:
-        json_data = json.load(json_file)
+        try:
+            json_data = json.load(json_file)
+        except ValueError as _e:
+            log.error("JSON is incorrectly formatted. Could not be loaded.")
+            raise ValueError(_e)
     return json_data
 
 def load_rules(rule_path, rule_name):
