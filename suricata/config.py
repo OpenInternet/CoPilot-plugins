@@ -73,7 +73,7 @@ def build_rule_pair(out_rule, in_rule):
 
     incoming = ''
     # Create an alert for incoming packets that match the following rule
-    incoming += 'reject ip any any <- any any '
+    incoming += 'reject ip any any <> any any '
     incoming += '(msg:"Rejected a {name} connection"; '.format(**in_rule)
     # Match the byte-sequence provided
     incoming += 'content:"{byte_seq}"; offset:0; '.format(**in_rule)
