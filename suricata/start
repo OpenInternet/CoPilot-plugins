@@ -3,14 +3,16 @@
 #set +x
 
 readonly IPTABLE_RULE="FORWARD -j NFQUEUE"
-readonly SURICATA_RULES="/tmp/copilot/copilot-suricata.rules"
+readonly SURICATA_CONFIG="/etc/suricata/copilot_norules.conf.yaml"
+# Rules not currently used, but kept here if needed
+# readonly SURICATA_RULES="/tmp/copilot/copilot-suricata.rules"
 #readonly SURICATA_EMPTY="/etc/suricata/copilot_norules.conf"
 
 start_suricata() {
-    if [[ -e "$SURICATA_RULES" ]]; then
+    if [[ -e "$SURICATA_CONFIG" ]]; then
         echo "Starting example configuration"
         iptables -I ${IPTABLE_RULE}
-        suricata -q 0 -c "$SURICATA_RULES"
+        suricata -q 0 -c "$SURICATA_CONFIG"
     else
         echo "No Rule file found. Not starting Suricata"
         #suricata -c "$SURICATA_EMPTY"
