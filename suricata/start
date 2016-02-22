@@ -10,6 +10,7 @@ readonly SURICATA_RULES="/tmp/copilot/copilot-suricata.rules"
 #readonly SURICATA_EMPTY="/etc/suricata/copilot_norules.conf"
 
 start_suricata() {
+    kill_current_suricata
     # Check if there is a rule file
     if [[ -e "$SURICATA_RULES" ]]; then
         echo "Starting example configuration"
@@ -25,11 +26,22 @@ start_suricata() {
     fi
 }
 
+kill_current_suricata() {
+    if [ -f $PID_FILE ]; then
+        PID1=$(cat $PID_FILE)
+        if kill -0 "$PID1" 2>/dev/null; then
+            kill "$PID1"
+            if [ -e "${PID_FILE}" ]; then
+                rm "${PID_FILE}" > /dev/null 2>&1
+            fi
+        fi
+    fi
+}
+
 clean_up() {
     echo "I am cleaning up after myself here."
     iptables -D ${IPTABLE_RULE}
-    kill $(< "${PID_FILE}")
-    rm "${PID_FILE}"
+    kill_current_suricata
     exit 0
 }
 
