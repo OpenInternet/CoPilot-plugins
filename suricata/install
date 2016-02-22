@@ -14,10 +14,6 @@ prepare() {
 install() {
     echo "installing package $PACKAGE_NAME"
     apt-get install -y suricata
-
-    # TODO (Still needed?)
-    # Python Yaml is needed for parsing the config files in setup
-    # apt-get install python-yaml
 }
 
 #Configure package
