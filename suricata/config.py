@@ -81,7 +81,7 @@ def build_rule_pair(out_rule, in_rule):
     # Once rejected also unset the flow identifier.
     incoming += 'flowbits:isset,{flow_name}; flowbits:unset,{flow_name}; '.format(**in_rule)
     # Create a random sid from the local use SID allocation
-    incoming += ' sid:{sid}; rev:1;) '.format(**out_rule)
+    incoming += ' sid:{sid}; rev:1;) '.format(**in_rule)
 
     return (outgoing, incoming)
 
