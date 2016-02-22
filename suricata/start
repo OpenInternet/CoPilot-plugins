@@ -3,7 +3,7 @@
 #set +x
 
 readonly IPTABLE_RULE="FORWARD -j NFQUEUE"
-readonly SURICATA_CONFIG="/etc/suricata/copilot_norules.conf.yaml"
+readonly SURICATA_CONFIG="/etc/suricata/copilot.conf.yaml"
 # Rules not currently used, but kept here if needed
 # readonly SURICATA_RULES="/tmp/copilot/copilot-suricata.rules"
 #readonly SURICATA_EMPTY="/etc/suricata/copilot_norules.conf"
