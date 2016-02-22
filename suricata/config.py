@@ -61,7 +61,7 @@ def build_rule_pair(out_rule, in_rule):
     """
     outgoing = ''
     # Create an alert for outgoing packets that match the following rule
-    outgoing += 'alert ip any any -> any any '
+    outgoing += 'alert ip $HOME_NET any -> $EXTERNAL_NET any '
     outgoing += '(msg:"Outgoing bytes for {name} identified."; '.format(**out_rule)
     # Match the byte-sequence provided
     outgoing += 'content:"{byte_seq}"; offset:0; '.format(**out_rule)
@@ -73,7 +73,7 @@ def build_rule_pair(out_rule, in_rule):
 
     incoming = ''
     # Create an alert for incoming packets that match the following rule
-    incoming += 'reject ip any any <> any any '
+    incoming += 'reject ip $EXTERNAL_NET any -> $HOME_NET any '
     incoming += '(msg:"Rejected a {name} connection"; '.format(**in_rule)
     # Match the byte-sequence provided
     incoming += 'content:"{byte_seq}"; offset:0; '.format(**in_rule)
