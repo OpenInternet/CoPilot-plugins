@@ -4,6 +4,7 @@
 
 readonly IPTABLE_RULE="FORWARD -j NFQUEUE"
 readonly SURICATA_CONFIG="/etc/suricata/copilot.conf.yaml"
+readonly PID_FILE="/var/run/suricata.pid"
 # Rules not currently used, but kept here if needed
 # readonly SURICATA_RULES="/tmp/copilot/copilot-suricata.rules"
 #readonly SURICATA_EMPTY="/etc/suricata/copilot_norules.conf"
@@ -12,7 +13,7 @@ start_suricata() {
     if [[ -e "$SURICATA_CONFIG" ]]; then
         echo "Starting example configuration"
         iptables -I ${IPTABLE_RULE}
-        suricata -q 0 -c "$SURICATA_CONFIG"
+        suricata -q 0 -c "$SURICATA_CONFIG" --pidfile "${PID_FILE}"
     else
         echo "No Rule file found. Not starting Suricata"
         #suricata -c "$SURICATA_EMPTY"
@@ -24,7 +25,7 @@ start_suricata() {
 clean_up() {
     echo "I am cleaning up after myself here."
     iptables -D ${IPTABLE_RULE}
-    kill $(< /var/run/suricata.pid)
+    kill $(< "${PID_FILE}")
     exit 0
 }
 
