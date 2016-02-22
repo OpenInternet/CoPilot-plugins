@@ -62,26 +62,26 @@ def build_rule_pair(out_rule, in_rule):
     outgoing = ''
     # Create an alert for outgoing packets that match the following rule
     outgoing += 'alert ip any any -> any any '
-    outgoing += '(msg:"Outgoing bytes for {name} identified.";'.format(**out_rule)
+    outgoing += '(msg:"Outgoing bytes for {name} identified."; '.format(**out_rule)
     # Match the byte-sequence provided
-    outgoing += 'content:{byte_seq}; offset:0;'.format(**out_rule)
+    outgoing += 'content:{byte_seq}; offset:0; '.format(**out_rule)
     # Set the flow identifier so the second pattern can match
     # Also, don't create an alert here as we have not seen the incoming packets
-    outgoing += 'flowbits:set{flow_name}; flowbits:noalert;'.format(**out_rule)
+    outgoing += 'flowbits:set,{flow_name}; flowbits:noalert; '.format(**out_rule)
     # Create a random sid from the local use SID allocation
-    outgoing += 'sid:{sid}; rev:1;)'.format(**out_rule)
+    outgoing += 'sid:{sid}; rev:1;) '.format(**out_rule)
 
     incoming = ''
     # Create an alert for incoming packets that match the following rule
     incoming += 'reject ip any any <- any any '
-    incoming += '(msg:"Rejected a {name} connection";'.format(**in_rule)
+    incoming += '(msg:"Rejected a {name} connection"; '.format(**in_rule)
     # Match the byte-sequence provided
-    incoming += 'content:{byte_seq}; offset:0;'.format(**in_rule)
+    incoming += 'content:{byte_seq}; offset:0; '.format(**in_rule)
     # Only reject packets when the flow identifier above has been set.
     # Once rejected also unset the flow identifier.
-    incoming += 'flowbits:isset,{flow_name}; flowbits:unset,{flow_name};'.format(**in_rule)
+    incoming += 'flowbits:isset,{flow_name}; flowbits:unset,{flow_name}; '.format(**in_rule)
     # Create a random sid from the local use SID allocation
-    incoming += ' sid:{sid}; rev:1;)'.format(**out_rule)
+    incoming += ' sid:{sid}; rev:1;) '.format(**out_rule)
 
     return (outgoing, incoming)
 
@@ -148,9 +148,7 @@ class ConfigWriter(Config):
         self.rule_path = os.path.abspath(os.path.join(plugin_dir,
                                                        "plugins/suricata/byte_dict.json"))
         self.load_rules()
-        self.header = ("%YAML 1.1\n" +
-                       "---\n" +
-                       "# This Suricata rules file is AUTOMATICALLY GENERATED.\n" +
+        self.header = ("# This Suricata rules file is AUTOMATICALLY GENERATED.\n" +
                        "# This file was created by the copilot suricata plugin.\n" +
                        "# Edits to this file will be overwritten without notice.\n" +
                        "# This file is created and deleted as needed.\n")
