@@ -176,5 +176,5 @@ class ConfigWriter(Config):
         log.debug("Starting to write rule pair {0}".format(rule_set))
         for rule in rule_set:
             log.debug("writing rule {0} to the config file.".format(rule))
-            config_file.write(rule[0]) # outgoing
-            config_file.write(rule[1]) # incoming
+            config_file.write(rule[0] + "\n") # outgoing
+            config_file.write(rule[1] + "\n") # incoming
