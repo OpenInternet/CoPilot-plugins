@@ -116,7 +116,7 @@ outputs:
 
   # alert output for use with Barnyard2
   - unified2-alert:
-      enabled: yes
+      enabled: no
       filename: unified2.alert
 
       # File size limit.  Can be specified in kb, mb, gb.  Just a number
@@ -189,7 +189,7 @@ outputs:
   # - encrypted streams after the key exchange
   #
   - pcap-log:
-      enabled:  no
+      enabled: no
       filename: log.pcap
 
       # File size limit.  Can be specified in kb, mb, gb.  Just a number
@@ -240,7 +240,7 @@ outputs:
 
   # a line based information for dropped packets in IPS mode
   - drop:
-      enabled: no
+      enabled: yes
       filename: drop.log
       append: yes
       #filetype: regular # 'regular', 'unix_stream' or 'unix_dgram'
