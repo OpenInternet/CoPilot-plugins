@@ -24,6 +24,7 @@ start_suricata() {
 clean_up() {
     echo "I am cleaning up after myself here."
     iptables -D ${IPTABLE_RULE}
+    kill $(< /var/run/suricata.pid)
     exit 0
 }
 
