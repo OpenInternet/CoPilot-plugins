@@ -148,7 +148,9 @@ class ConfigWriter(Config):
         self.rule_path = os.path.abspath(os.path.join(plugin_dir,
                                                        "plugins/suricata/byte_dict.json"))
         self.load_rules()
-        self.header = ("# This Suricata rules file is AUTOMATICALLY GENERATED.\n" +
+        self.header = ("%YAML 1.1\n" +
+                       "---\n" +
+                       "# This Suricata rules file is AUTOMATICALLY GENERATED.\n" +
                        "# This file was created by the copilot suricata plugin.\n" +
                        "# Edits to this file will be overwritten without notice.\n" +
                        "# This file is created and deleted as needed.\n")
