@@ -13,6 +13,7 @@ start_suricata() {
     if [[ -e "$SURICATA_CONFIG" ]]; then
         echo "Starting example configuration"
         iptables -I ${IPTABLE_RULE}
+        touch "${PID_FILE}"
         suricata -q 0 -c "$SURICATA_CONFIG" --pidfile "${PID_FILE}"
     else
         echo "No Rule file found. Not starting Suricata"
@@ -26,6 +27,7 @@ clean_up() {
     echo "I am cleaning up after myself here."
     iptables -D ${IPTABLE_RULE}
     kill $(< "${PID_FILE}")
+    rm "${PID_FILE}"
     exit 0
 }
 
