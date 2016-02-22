@@ -64,7 +64,7 @@ def build_rule_pair(out_rule, in_rule):
     outgoing += 'alert ip any any -> any any '
     outgoing += '(msg:"Outgoing bytes for {name} identified."; '.format(**out_rule)
     # Match the byte-sequence provided
-    outgoing += 'content:{byte_seq}; offset:0; '.format(**out_rule)
+    outgoing += 'content:"{byte_seq}"; offset:0; '.format(**out_rule)
     # Set the flow identifier so the second pattern can match
     # Also, don't create an alert here as we have not seen the incoming packets
     outgoing += 'flowbits:set,{flow_name}; flowbits:noalert; '.format(**out_rule)
@@ -76,7 +76,7 @@ def build_rule_pair(out_rule, in_rule):
     incoming += 'reject ip any any <- any any '
     incoming += '(msg:"Rejected a {name} connection"; '.format(**in_rule)
     # Match the byte-sequence provided
-    incoming += 'content:{byte_seq}; offset:0; '.format(**in_rule)
+    incoming += 'content:"{byte_seq}"; offset:0; '.format(**in_rule)
     # Only reject packets when the flow identifier above has been set.
     # Once rejected also unset the flow identifier.
     incoming += 'flowbits:isset,{flow_name}; flowbits:unset,{flow_name}; '.format(**in_rule)
