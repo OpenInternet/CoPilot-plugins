@@ -4,8 +4,9 @@ from copilot.models.config import Config
 from uuid import uuid4
 import json
 import os
+
 import logging
-log = logging.getLogger(__name__)
+log = logging.getLogger("copilot.plugins." + __name__)
 
 
 # BYTE DICT FORMAT: JSON
