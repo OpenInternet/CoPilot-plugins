@@ -13,7 +13,7 @@ prepare() {
 #Install the actual package
 install() {
     echo "installing package $PACKAGE_NAME"
-    apt-get install suricata
+    apt-get install -y suricata
 
     # TODO (Still needed?)
     # Python Yaml is needed for parsing the config files in setup

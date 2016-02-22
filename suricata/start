@@ -10,7 +10,7 @@ start_suricata() {
     if [[ -e "$SURICATA_RULES" ]]; then
         echo "Starting example configuration"
         iptables -I ${IPTABLE_RULE}
-        suricata -q 0 -c "$SURICATA_RULEs"
+        suricata -q 0 -c "$SURICATA_RULES"
     else
         echo "No Rule file found. Not starting Suricata"
         #suricata -c "$SURICATA_EMPTY"
