@@ -12,7 +12,7 @@
         "byte_sequences" : [
             {"rule_type":"adversary labs",
              "outgoing": [22, 3, 3, 0, 81, 2, 0, 0, 77, 3, 3, 83],
-             "incoming": [22, 3, 1]}
+             "incoming": [22, 3, 1]},
             {"rule_type":"raw rule",
              "rule":"alert tcp any any -> any any (msg:\"COPILOT - HTTPS Packet Detected\"; flow:established; app-layer-protocol:tls; sid:2271019; rev:1;)"}
         ]},
