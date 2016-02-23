@@ -33,9 +33,28 @@ kill_current_suricata() {
         echo "PID file ${PID_FILE} not found"
         PID1=$(cat $PID_FILE)
         if kill -0 "${PID1}" 2>/dev/null; then
-            echo "Process found using PID ${PID1}."
+            echo "Existing Suricata process found with PID = ${PID1}."
             echo "Attempting to kill process"
-            kill "$PID1"
+            if [ -n "$PID1" ]; then
+                kill "$PID1"
+                ret=$?
+                sleep 2
+                if kill -0 "$PID1" 2>/dev/null; then
+                    ret=$?
+                    echo -n "Waiting . "
+                    cnt=0
+                    while kill -0 "$PID1" 2>/dev/null; do
+                        ret=$?
+                        cnt=$(expr "$cnt" + 1)
+                        if [ "$cnt" -gt 10 ]; then
+                            kill -9 "$PID1"
+                            break
+                        fi
+                        sleep 2
+                        echo -n ". "
+                    done
+                fi
+            fi
             if [[ -e "${PID_FILE}" ]]; then
                 echo "Removing PID file ${PID_FILE}"
                 rm "${PID_FILE}" > /dev/null 2>&1
