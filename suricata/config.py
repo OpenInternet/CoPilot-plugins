@@ -113,28 +113,35 @@ def make_rules(rule_set):
         byte_sequences = contents.get("byte_sequences", [])
 
         for sequence in byte_sequences:
-            try:
-                _outgoing = {}
-                _outgoing['byte_seq'] = ascii_byte_to_socrata_seq(sequence['outgoing'])
-                _outgoing['name'] = name
-                _outgoing['flow_name'] = flow_name
-                # SID's for rules created here fall in the 1000000-1999999 range.
-                # See: http://doc.emergingthreats.net/bin/view/Main/SidAllocation
-                _outgoing["sid"] = int(sequence.get("sid", randrange(1000000,1999999)))
+            rule_type = sequence.get("rule_type","")
+            if rule_type == "adversary labs":
+                try:
+                    _outgoing = {}
+                    _outgoing['byte_seq'] = ascii_byte_to_socrata_seq(sequence['outgoing'])
+                    _outgoing['name'] = name
+                    _outgoing['flow_name'] = flow_name
+                    # SID's for rules created here fall in the 1000000-1999999 range.
+                    # See: http://doc.emergingthreats.net/bin/view/Main/SidAllocation
+                    _outgoing["sid"] = int(sequence.get("sid", randrange(1000000,1999999)))
 
-                _incoming = {}
-                _incoming['byte_seq'] = ascii_byte_to_socrata_seq(sequence['incoming'])
-                _incoming['name'] = name
-                _incoming['flow_name'] = flow_name
-                _incoming["sid"] = int(sequence.get("sid", randrange(1000000,1999999)))
+                    _incoming = {}
+                    _incoming['byte_seq'] = ascii_byte_to_socrata_seq(sequence['incoming'])
+                    _incoming['name'] = name
+                    _incoming['flow_name'] = flow_name
+                    _incoming["sid"] = int(sequence.get("sid", randrange(1000000,1999999)))
 
-                # Add the formatted rule pair
-                rules.setdefault(name, []).append(build_rule_pair(_outgoing, _incoming))
+                    # Add the formatted rule pair
+                    rules.setdefault(name, []).append(build_rule_pair(_outgoing, _incoming))
 
-            except KeyError:
-                log.debug("Rule pair for {0} is missing a byte sequence".format(traffic_type))
-                # If either byte_seq in missing we don't want to add to our rules
-                continue
+                except KeyError:
+                    log.debug("Rule pair for {0} is missing a byte sequence".format(traffic_type))
+                    # If either byte_seq in missing we don't want to add to our rules
+                    continue
+            elif rule_type == "raw_rule":
+                raw_rule = sequence.get("rule", "")
+                if raw_rule != "":
+                    # Placing rule in an array to match the way pairs are in a sub-object
+                    rules.setdefault(name, []).append([raw_rule])
     return rules
 
 
@@ -174,5 +181,5 @@ class ConfigWriter(Config):
         log.debug("Starting to write rule pair {0}".format(rule_set))
         for rule in rule_set:
             log.debug("writing rule {0} to the config file.".format(rule))
-            config_file.write(rule[0] + "\n") # outgoing
-            config_file.write(rule[1] + "\n") # incoming
+            for sub_rule in rule:
+                config_file.write(sub_rule + "\n")
