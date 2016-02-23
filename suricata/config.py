@@ -129,7 +129,7 @@ def make_rules(rule_set):
                 _incoming["sid"] = int(sequence.get("sid", randrange(1000000,1999999)))
 
                 # Add the formatted rule pair
-                rules.setdefault(traffic_type, []).append(build_rule_pair(_outgoing, _incoming))
+                rules.setdefault(name, []).append(build_rule_pair(_outgoing, _incoming))
 
             except KeyError:
                 log.debug("Rule pair for {0} is missing a byte sequence".format(traffic_type))
