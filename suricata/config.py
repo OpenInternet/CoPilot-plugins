@@ -59,32 +59,32 @@ def build_rule_pair(out_rule, in_rule):
         {'name':'', 'flow_name':'', 'byte_seq':'', 'sid':''}
     in_rule (dict): A dictionary containing information about the incoming packet that responds to the initial outgoing packet in a stream to block.
     """
-    outgoing = ''
-    # Create an alert for outgoing packets that match the following rule
-    outgoing += 'alert ip $HOME_NET any -> $EXTERNAL_NET any '
-    outgoing += '(msg:"COPILOT - Outgoing bytes for {name} identified."; '.format(**out_rule)
-    # Match the byte-sequence provided
-    outgoing += 'content:"{byte_seq}"; offset:0; '.format(**out_rule)
-    # Set the flow identifier so the second pattern can match
-    # Also, don't create an alert here as we have not seen the incoming packets
-    outgoing += 'flowbits:set,{flow_name}; flowbits:noalert; '.format(**out_rule)
-    # Create a random sid from the local use SID allocation
-    outgoing += 'sid:{sid}; rev:1;) '.format(**out_rule)
 
     incoming = ''
-    # Create an alert for incoming packets that match the following rule
-    incoming += 'reject ip $EXTERNAL_NET any -> $HOME_NET any '
+    # Create an alert for incoming packets (to external server) that match the following rule
+    incoming += 'reject ip $HOME_NET any ->  $EXTERNAL_NET any '
     incoming += '(msg:"COPILOT - Rejected a {name} connection"; '.format(**in_rule)
     # Match the byte-sequence provided
     incoming += 'content:"{byte_seq}"; offset:0; '.format(**in_rule)
-    # Only reject packets when the flow identifier above has been set.
-    # Once rejected also unset the flow identifier.
-    incoming += 'flowbits:isset,{flow_name}; flowbits:unset,{flow_name}; '.format(**in_rule)
+    # Set the flow identifier so the second pattern can match
+    # Also, don't create an alert here as we have not seen the outgoing packets
+    incoming += 'flowbits:set,{flow_name}; flowbits:noalert; '.format(**in_rule)
     # Create a random sid from the local use SID allocation
     incoming += ' sid:{sid}; rev:1;) '.format(**in_rule)
 
-    return (outgoing, incoming)
+    outgoing = ''
+    # Create an alert for outgoing packets (to client device) that match the following rule
+    outgoing += 'alert ip $EXTERNAL_NET any ->  any $HOME_NET '
+    outgoing += '(msg:"COPILOT - Outgoing bytes for {name} identified."; '.format(**out_rule)
+    # Match the byte-sequence provided
+    outgoing += 'content:"{byte_seq}"; offset:0; '.format(**out_rule)
+    # Only reject packets when the flow identifier above has been set.
+    # Once rejected also unset the flow identifier.
+    outgoing += 'flowbits:isset,{flow_name}; flowbits:unset,{flow_name}; '.format(**out_rule)
+    # Create a random sid from the local use SID allocation
+    outgoing += 'sid:{sid}; rev:1;) '.format(**out_rule)
 
+    return (incoming, outgoing)
 
 def get_json(json_path):
     """Get json data from a file."""
