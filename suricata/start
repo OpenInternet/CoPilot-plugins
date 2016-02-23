@@ -27,11 +27,11 @@ start_suricata() {
 }
 
 kill_current_suricata() {
-    if [ -f $PID_FILE ]; then
+    if [[ -f "${PID_FILE}" ]]; then
         PID1=$(cat $PID_FILE)
         if kill -0 "$PID1" 2>/dev/null; then
             kill "$PID1"
-            if [ -e "${PID_FILE}" ]; then
+            if [[ -e "${PID_FILE}" ]]; then
                 rm "${PID_FILE}" > /dev/null 2>&1
             fi
         fi
