@@ -137,7 +137,7 @@ def make_rules(rule_set):
                     log.debug("Rule pair for {0} is missing a byte sequence".format(traffic_type))
                     # If either byte_seq in missing we don't want to add to our rules
                     continue
-            elif rule_type == "raw_rule":
+            elif rule_type == "raw rule":
                 raw_rule = sequence.get("rule", "")
                 if raw_rule != "":
                     # Placing rule in an array to match the way pairs are in a sub-object
