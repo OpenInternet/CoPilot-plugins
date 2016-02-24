@@ -89,7 +89,7 @@ def build_adversary_rules(name, sequence):
     set_flow_outgoing = ''
     # Create an alert for outgoing packets (to client device) that match the following rule
     set_flow_outgoing += 'alert ip $EXTERNAL_NET any ->  any $HOME_NET '
-    set_flow_outgoing += '(msg:"COPILOT - Rejected a {name} connection"; '.format(**out_rule)
+    set_flow_outgoing += '(msg:"COPILOT - Outgoing (to client) bytes for {name} identified."; '.format(**out_rule)
     # Match the byte-sequence provided
     set_flow_outgoing += 'content:"{byte_seq}"; offset:0; '.format(**out_rule)
     # Set the flow identifier so the second pattern can match
@@ -105,7 +105,7 @@ def build_adversary_rules(name, sequence):
     reject_incoming = ''
     # Create an alert for incoming packets (to external server) that match the following rule
     reject_incoming += 'reject ip $HOME_NET any ->  $EXTERNAL_NET any '
-    reject_incoming += '(msg:"COPILOT - Incoming (to server) bytes for {name} identified."; '.format(**in_rule)
+    reject_incoming += '(msg:"COPILOT - Rejected a {name} connection."; '.format(**in_rule)
     # Match the byte-sequence provided
     reject_incoming += 'content:"{byte_seq}"; offset:0; '.format(**in_rule)
     # Only reject packets when the flow identifier above has been set.
