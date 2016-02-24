@@ -59,15 +59,15 @@ def build_adversary_rules(name, sequence):
         {'name':'', 'flow_name':'', 'byte_seq':'', 'sid':''}
     in_rule (dict): A dictionary containing information about the incoming packet that responds to the initial outgoing packet in a stream to block.
     """
-    _outgoing = {}
-    _outgoing['byte_seq'] = ascii_byte_to_socrata_seq(sequence['outgoing'])
-    _outgoing['name'] = name
-    _outgoing['flow_name'] = sequence.get("flow_name", str(uuid4())[-12:])
+    out_rule = {}
+    out_rule['byte_seq'] = ascii_byte_to_socrata_seq(sequence['outgoing'])
+    out_rule['name'] = name
+    out_rule['flow_name'] = sequence.get("flow_name", str(uuid4())[-12:])
 
-    _incoming = {}
-    _incoming['byte_seq'] = ascii_byte_to_socrata_seq(sequence['incoming'])
-    _incoming['name'] = name
-    _incoming['flow_name'] = sequence.get("flow_name", str(uuid4())[-12:])
+    in_rule = {}
+    in_rule['byte_seq'] = ascii_byte_to_socrata_seq(sequence['incoming'])
+    in_rule['name'] = name
+    in_rule['flow_name'] = sequence.get("flow_name", str(uuid4())[-12:])
 
 
     set_flow_incoming = ''
@@ -132,7 +132,7 @@ def build_adversary_rules(name, sequence):
     # See: http://doc.emergingthreats.net/bin/view/Main/SidAllocation
     reject_outgoing += 'sid:{0}; rev:1;) '.format(randrange(1000000,1999999))
 
-    rules = [set_flow_incoming, set_flow_outgoing, reject_incoming reject_outgoing]
+    rules = [set_flow_incoming, set_flow_outgoing, reject_incoming, reject_outgoing]
     return rules
 
 def get_json(json_path):
