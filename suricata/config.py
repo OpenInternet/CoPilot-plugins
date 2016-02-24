@@ -47,7 +47,7 @@ def ascii_byte_to_socrata_seq(byte_seq):
     socrata_seq = "|" + spaced_hex + "|"
     return socrata_seq
 
-def build_rule_pair(out_rule, in_rule):
+def build_adversary_rules(name, sequence):
     """Builds Suricata rule pair to match an identified flow.
 
     These rule pairs use suricata flowbits to match a connection
@@ -59,32 +59,81 @@ def build_rule_pair(out_rule, in_rule):
         {'name':'', 'flow_name':'', 'byte_seq':'', 'sid':''}
     in_rule (dict): A dictionary containing information about the incoming packet that responds to the initial outgoing packet in a stream to block.
     """
+    _outgoing = {}
+    _outgoing['byte_seq'] = ascii_byte_to_socrata_seq(sequence['outgoing'])
+    _outgoing['name'] = name
+    _outgoing['flow_name'] = sequence.get("flow_name", str(uuid4())[-12:])
 
-    incoming = ''
+    _incoming = {}
+    _incoming['byte_seq'] = ascii_byte_to_socrata_seq(sequence['incoming'])
+    _incoming['name'] = name
+    _incoming['flow_name'] = sequence.get("flow_name", str(uuid4())[-12:])
+
+
+    set_flow_incoming = ''
     # Create an alert for incoming packets (to external server) that match the following rule
-    incoming += 'reject ip $HOME_NET any ->  $EXTERNAL_NET any '
-    incoming += '(msg:"COPILOT - Rejected a {name} connection"; '.format(**in_rule)
+    set_flow_incoming += 'alert ip $HOME_NET any ->  $EXTERNAL_NET any '
+    set_flow_incoming += '(msg:"COPILOT - Incoming (to server) bytes for {name} identified."; '.format(**in_rule)
     # Match the byte-sequence provided
-    incoming += 'content:"{byte_seq}"; offset:0; '.format(**in_rule)
+    set_flow_incoming += 'content:"{byte_seq}"; offset:0; '.format(**in_rule)
     # Set the flow identifier so the second pattern can match
     # Also, don't create an alert here as we have not seen the outgoing packets
-    incoming += 'flowbits:set,{flow_name}; flowbits:noalert; '.format(**in_rule)
+    set_flow_incoming += 'flowbits:set,{flow_name}; flowbits:noalert; '.format(**in_rule)
+    # Match (established) flows (to server) only and on the packet level (no stream)
+    set_flow_incoming += 'flow:to_server, established, no_stream; '
     # Create a random sid from the local use SID allocation
-    incoming += ' sid:{sid}; rev:1;) '.format(**in_rule)
+    # SID's for rules created here fall in the 1000000-1999999 range.
+    # See: http://doc.emergingthreats.net/bin/view/Main/SidAllocation
+    set_flow_incoming += 'sid:{0}; rev:1;) '.format(randrange(1000000,1999999))
 
-    outgoing = ''
+    set_flow_outgoing = ''
     # Create an alert for outgoing packets (to client device) that match the following rule
-    outgoing += 'alert ip $EXTERNAL_NET any ->  any $HOME_NET '
-    outgoing += '(msg:"COPILOT - Outgoing bytes for {name} identified."; '.format(**out_rule)
+    set_flow_outgoing += 'alert ip $EXTERNAL_NET any ->  any $HOME_NET '
+    set_flow_outgoing += '(msg:"COPILOT - Rejected a {name} connection"; '.format(**out_rule)
     # Match the byte-sequence provided
-    outgoing += 'content:"{byte_seq}"; offset:0; '.format(**out_rule)
-    # Only reject packets when the flow identifier above has been set.
-    # Once rejected also unset the flow identifier.
-    outgoing += 'flowbits:isset,{flow_name}; flowbits:unset,{flow_name}; '.format(**out_rule)
+    set_flow_outgoing += 'content:"{byte_seq}"; offset:0; '.format(**out_rule)
+    # Set the flow identifier so the second pattern can match
+    # Also, don't create an alert here as we have not seen the outgoing packets
+    set_flow_outgoing += 'flowbits:set,{flow_name}; flowbits:noalert; '.format(**out_rule)
+    # Match (established) flows (to client) only and on the packet level (no stream)
+    set_flow_outgoing += 'flow:to_client, established, no_stream; '
     # Create a random sid from the local use SID allocation
-    outgoing += 'sid:{sid}; rev:1;) '.format(**out_rule)
+    # SID's for rules created here fall in the 1000000-1999999 range.
+    # See: http://doc.emergingthreats.net/bin/view/Main/SidAllocation
+    set_flow_outgoing += 'sid:{0}; rev:1;) '.format(randrange(1000000,1999999))
 
-    return (incoming, outgoing)
+    reject_incoming = ''
+    # Create an alert for incoming packets (to external server) that match the following rule
+    reject_incoming += 'reject ip $HOME_NET any ->  $EXTERNAL_NET any '
+    reject_incoming += '(msg:"COPILOT - Incoming (to server) bytes for {name} identified."; '.format(**in_rule)
+    # Match the byte-sequence provided
+    reject_incoming += 'content:"{byte_seq}"; offset:0; '.format(**in_rule)
+    # Only reject packets when the flow identifier above has been set.
+    reject_incoming += 'flowbits:isset,{flow_name}; '.format(**in_rule)
+    # Match (established) flows (to server) only and on the packet level (no stream)
+    reject_incoming += 'flow:to_server, established, no_stream; '
+    # Create a random sid from the local use SID allocation
+    # SID's for rules created here fall in the 1000000-1999999 range.
+    # See: http://doc.emergingthreats.net/bin/view/Main/SidAllocation
+    reject_incoming += 'sid:{0}; rev:1;) '.format(randrange(1000000,1999999))
+
+    reject_outgoing = ''
+    # Create an alert for outgoing packets (to client device) that match the following rule
+    reject_outgoing += 'reject ip $EXTERNAL_NET any ->  any $HOME_NET '
+    reject_outgoing += '(msg:"COPILOT - Rejected a {name} connection"; '.format(**out_rule)
+    # Match the byte-sequence provided
+    reject_outgoing += 'content:"{byte_seq}"; offset:0; '.format(**out_rule)
+    # Only reject packets when the flow identifier above has been set.
+    reject_outgoing += 'flowbits:isset,{flow_name}; '.format(**out_rule)
+    # Match (established) flows (to client) only and on the packet level (no stream)
+    reject_outgoing += 'flow:to_client, established, no_stream; '
+    # Create a random sid from the local use SID allocation
+    # SID's for rules created here fall in the 1000000-1999999 range.
+    # See: http://doc.emergingthreats.net/bin/view/Main/SidAllocation
+    reject_outgoing += 'sid:{0}; rev:1;) '.format(randrange(1000000,1999999))
+
+    rules = [set_flow_incoming, set_flow_outgoing, reject_incoming reject_outgoing]
+    return rules
 
 def get_json(json_path):
     """Get json data from a file."""
@@ -109,39 +158,23 @@ def make_rules(rule_set):
     rules = {}
     for traffic_type, contents in rule_set.items():
         name = contents.get("name", str(uuid4())[-12:])
-        flow_name = contents.get("flow_name", str(uuid4())[-12:])
         byte_sequences = contents.get("byte_sequences", [])
 
         for sequence in byte_sequences:
             rule_type = sequence.get("rule_type","")
             if rule_type == "adversary labs":
                 try:
-                    _outgoing = {}
-                    _outgoing['byte_seq'] = ascii_byte_to_socrata_seq(sequence['outgoing'])
-                    _outgoing['name'] = name
-                    _outgoing['flow_name'] = flow_name
-                    # SID's for rules created here fall in the 1000000-1999999 range.
-                    # See: http://doc.emergingthreats.net/bin/view/Main/SidAllocation
-                    _outgoing["sid"] = int(sequence.get("sid", randrange(1000000,1999999)))
-
-                    _incoming = {}
-                    _incoming['byte_seq'] = ascii_byte_to_socrata_seq(sequence['incoming'])
-                    _incoming['name'] = name
-                    _incoming['flow_name'] = flow_name
-                    _incoming["sid"] = int(sequence.get("sid", randrange(1000000,1999999)))
-
                     # Add the formatted rule pair
-                    rules.setdefault(name, []).append(build_rule_pair(_outgoing, _incoming))
-
+                    rules.setdefault(name, []).append(build_adversary_rules(name, sequence))
                 except KeyError:
-                    log.debug("Rule pair for {0} is missing a byte sequence".format(traffic_type))
                     # If either byte_seq in missing we don't want to add to our rules
-                    continue
+                    log.info("Rule pair for {0} is missing a byte sequence".format(traffic_type))
             elif rule_type == "raw rule":
-                raw_rule = sequence.get("rule", "")
-                if raw_rule != "":
-                    # Placing rule in an array to match the way pairs are in a sub-object
-                    rules.setdefault(name, []).append([raw_rule])
+                try:
+                    rules.setdefault(name, []).append([sequence["rule"]])
+                except KeyError:
+                    log.info("Rule {0} does not have the required ".format(name) +
+                             "rule key and will be skipped")
     return rules
 
 
