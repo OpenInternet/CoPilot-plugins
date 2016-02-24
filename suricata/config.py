@@ -79,8 +79,6 @@ def build_adversary_rules(name, sequence):
     # Set the flow identifier so the second pattern can match
     # Also, don't create an alert here as we have not seen the outgoing packets
     set_flow_incoming += 'flowbits:set,{flow_name}; flowbits:noalert; '.format(**in_rule)
-    # Match (established) flows (to server) only and on the packet level (no stream)
-    set_flow_incoming += 'flow:to_server, established, no_stream; '
     # Create a random sid from the local use SID allocation
     # SID's for rules created here fall in the 1000000-1999999 range.
     # See: http://doc.emergingthreats.net/bin/view/Main/SidAllocation
@@ -95,8 +93,6 @@ def build_adversary_rules(name, sequence):
     # Set the flow identifier so the second pattern can match
     # Also, don't create an alert here as we have not seen the outgoing packets
     set_flow_outgoing += 'flowbits:set,{flow_name}; flowbits:noalert; '.format(**out_rule)
-    # Match (established) flows (to client) only and on the packet level (no stream)
-    set_flow_outgoing += 'flow:to_client, established, no_stream; '
     # Create a random sid from the local use SID allocation
     # SID's for rules created here fall in the 1000000-1999999 range.
     # See: http://doc.emergingthreats.net/bin/view/Main/SidAllocation
@@ -110,8 +106,6 @@ def build_adversary_rules(name, sequence):
     reject_incoming += 'content:"{byte_seq}"; offset:0; '.format(**in_rule)
     # Only reject packets when the flow identifier above has been set.
     reject_incoming += 'flowbits:isset,{flow_name}; '.format(**in_rule)
-    # Match (established) flows (to server) only and on the packet level (no stream)
-    reject_incoming += 'flow:to_server, established, no_stream; '
     # Create a random sid from the local use SID allocation
     # SID's for rules created here fall in the 1000000-1999999 range.
     # See: http://doc.emergingthreats.net/bin/view/Main/SidAllocation
@@ -125,8 +119,6 @@ def build_adversary_rules(name, sequence):
     reject_outgoing += 'content:"{byte_seq}"; offset:0; '.format(**out_rule)
     # Only reject packets when the flow identifier above has been set.
     reject_outgoing += 'flowbits:isset,{flow_name}; '.format(**out_rule)
-    # Match (established) flows (to client) only and on the packet level (no stream)
-    reject_outgoing += 'flow:to_client, established, no_stream; '
     # Create a random sid from the local use SID allocation
     # SID's for rules created here fall in the 1000000-1999999 range.
     # See: http://doc.emergingthreats.net/bin/view/Main/SidAllocation
