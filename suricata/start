@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+
+#set -x
+
+readonly IPTABLE_RULE="FORWARD -j NFQUEUE"
+readonly SURICATA_CONFIG="/etc/suricata/copilot.conf.yaml"
+readonly PID_FILE="/var/run/suricata.pid"
+# Rules not currently used, but kept here if needed
+readonly SURICATA_RULES="/tmp/copilot/copilot-suricata.rules"
+#readonly SURICATA_EMPTY="/etc/suricata/copilot_norules.conf"
+
+start_suricata() {
+    echo "Starting Suricata plugin"
+    kill_current_suricata
+    # Check if there is a rule file
+    if [[ -e "$SURICATA_RULES" ]]; then
+        echo "Starting example configuration"
+        iptables -I ${IPTABLE_RULE}
+        touch "${PID_FILE}"
+        # Start suricata with config (rule file location is in config)
+        suricata -q 0 -c "$SURICATA_CONFIG" --pidfile "${PID_FILE}"
+    else
+        echo "No Rule file found. Not starting Suricata"
+        #suricata -c "$SURICATA_EMPTY"
+        echo "Ignore the upcoming error message from iptables"
+        echo "We didn't create a rule, so it will not be able to delete one."
+    fi
+}
+
+kill_current_suricata() {
+    echo "Killing existing suricata process."
+    if [[ -f "${PID_FILE}" ]]; then
+        echo "PID file ${PID_FILE} not found"
+        PID1=$(cat $PID_FILE)
+        if kill -0 "${PID1}" 2>/dev/null; then
+            echo "Existing Suricata process found with PID = ${PID1}."
+            echo "Attempting to kill process"
+            if [ -n "$PID1" ]; then
+                kill "$PID1"
+                ret=$?
+                sleep 2
+                if kill -0 "$PID1" 2>/dev/null; then
+                    ret=$?
+                    echo -n "Waiting . "
+                    cnt=0
+                    while kill -0 "$PID1" 2>/dev/null; do
+                        ret=$?
+                        cnt=$(expr "$cnt" + 1)
+                        if [ "$cnt" -gt 10 ]; then
+                            kill -9 "$PID1"
+                            break
+                        fi
+                        sleep 2
+                        echo -n ". "
+                    done
+                fi
+            fi
+            if [[ -e "${PID_FILE}" ]]; then
+                echo "Removing PID file ${PID_FILE}"
+                rm "${PID_FILE}" > /dev/null 2>&1
+            fi
+            echo "No Process using PID ${PID1}"
+        fi
+        echo "No PID file found at ${PID_FILE}"
+    fi
+}
+
+clean_up() {
+    echo "Cleaning up after Suricata plugin."
+    kill_current_suricata
+    iptables -D ${IPTABLE_RULE}
+    exit 0
+}
+
+
+main() {
+    start_suricata
+}
+trap 'clean_up' EXIT SIGTERM
+main
