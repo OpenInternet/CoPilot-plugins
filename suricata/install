@@ -37,6 +37,7 @@ update_config_files() {
 
 
 main() {
+    cd $COPILOT_PLUGINS_DIRECTORY/plugins/suricata
     prepare
     install
     setup
