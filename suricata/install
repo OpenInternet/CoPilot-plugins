@@ -26,7 +26,7 @@ setup() {
 
 update_config_files() {
     # Copy custom suricata config file over.
-    cp "${COPILOT_PLUGINS_DIRECTORY}"plugins/suricata/suricata.yaml /etc/suricata/copilot.conf.yaml
+    cp /bin/copilot/plugins/suricata/suricata.yaml /etc/suricata/copilot.conf.yaml
 
     # Change suricata main config file to have default conf point at copilot_norules.conf
     sed -i 's/^SURCONF.*/SURCONF=\/etc\/suricata\/copilot_norules\.conf/' "/etc/default/suricata"
@@ -37,7 +37,6 @@ update_config_files() {
 
 
 main() {
-    cd "${COPILOT_PLUGINS_DIRECTORY}"plugins/suricata
     prepare
     install
     setup
