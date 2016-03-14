@@ -61,7 +61,7 @@ class Plugin(PluginOptions):
         combined_bytes = {}
         for byte_snippet in os.listdir(byte_dir):
             if byte_snippet.endswith(".json"):
-                json_data = get_json(byte_snippet)
+                json_data = get_json(os.path.join(byte_dir, byte_snippet))
                 for traffic_type, contents in json_data.iteritems():
                     # This base will not overwrite values
                     combined_bytes.setdefault(traffic_type, {})
