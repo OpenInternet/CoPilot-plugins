@@ -241,8 +241,8 @@ class ConfigWriter(Config):
         super(ConfigWriter, self).__init__()
         self.config_type = "suricata"
         plugin_dir = os.environ['COPILOT_PLUGINS_DIRECTORY']
-        self.rule_path = os.path.abspath(os.path.join(plugin_dir,
-                                                       "plugins/suricata/byte_dict.json"))
+        self.config_directory = "/tmp/copilot/"
+        self.rule_path = self.bytes_file = os.path.join(self.config_directory, "suricata_raw_rules")
         self.load_rules()
         self.header = ("# This Suricata rules file is AUTOMATICALLY GENERATED.\n" +
                        "# This file was created by the copilot suricata plugin.\n" +
