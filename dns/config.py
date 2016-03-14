@@ -1,10 +1,26 @@
 from copilot.models.config import Config
+from copilot.models.config import PluginOptions
 import string
 from urlparse import urlparse
+from os import path
 
 #stat logging
 import logging
 log = logging.getLogger(__name__)
+
+
+class Plugin(PluginOptions):
+
+    def __init__(self):
+        super(PluginOptions, self).__init__()
+        log.debug("Initializing dns plugin.")
+        self.rules = {"block":set(["dns"]),
+                      "redirect":set(["dns"])}
+        self.name = "dnschef"
+        self.has_subtarget = True
+        self.config_directory = "/tmp/copilot/"
+        self.config_file = "dnschef.conf"
+        self.config_path = path.join(self.config_directory, self.config_file)
 
 
 class ConfigWriter(Config):
@@ -71,9 +87,3 @@ class ConfigWriter(Config):
         elif split_sub[1] in tld:
             log.debug("The domain {0} has exactly two parts, and the second part IS a top level domain I recognize. Interpreting as a domain name with a top level domain.".format(_sub))
             return "*.{0}.{1}".format(split_sub[0], split_sub[1])
-
-
-
-def setup(app):
-    dns = ConfigWriter()
-    app.get_config_writer(dns)
