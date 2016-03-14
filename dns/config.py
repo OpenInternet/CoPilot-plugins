@@ -16,7 +16,7 @@ class Plugin(PluginOptions):
         log.debug("Initializing dns plugin.")
         self.rules = {"block":set(["dns"]),
                       "redirect":set(["dns"])}
-        self.name = "dnschef"
+        self.name = "dns"
         self.has_subtarget = True
         self.config_directory = "/tmp/copilot/"
         self.config_file = "dnschef.conf"
