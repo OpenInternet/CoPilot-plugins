@@ -20,5 +20,5 @@
             {"rule_type":"raw rule",
              "action":"block",
              "rule":"reject tcp any any -> any any (msg:\"COPILOT - HTTPS Packet Detected\"; flow:established; app-layer-protocol:tls; sid:2271019; rev:1;)"}
-        ]},
+        ]}
 }
