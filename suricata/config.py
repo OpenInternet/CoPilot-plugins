@@ -1,6 +1,6 @@
-from random import randrange
-
 from copilot.models.config import Config
+from copilot.models.config import PluginOptions
+from random import randrange
 from uuid import uuid4
 import json
 import os
@@ -9,11 +9,74 @@ import logging
 log = logging.getLogger("copilot.plugins." + __name__)
 
 
-# BYTE DICT FORMAT: JSON
-# { "TYPE":
-#         [{"outgoing":[],
-#           "incoming":[]}]}
+class Plugin(PluginOptions):
 
+    def __init__(self, byte_dir=None, recompile_rules=False):
+        super(PluginOptions, self).__init__()
+        log.debug("Initializing suricata plugin.")
+        self.name = "suricata"
+        self.has_subtarget = False
+        self.config_directory = "/tmp/copilot/"
+        self.config_file = "copilot-suricata.rules"
+        self.config_path = os.path.join(self.config_directory, self.config_file)
+        self.bytes_file = os.path.join(self.config_directory, "suricata_raw_rules")
+        if not os.path.isfile(self.bytes_file) or recompile_rules is True:
+            if byte_dir is None:
+                byte_dir = "/bin/copilot/plugins/suricata/rule_snippets"
+            elif not os.path.isdir(byte_dir):
+                raise ValueError("Byte directory path provided {0}".format(byte_dir) +
+                                 " does not exist.")
+            self.rebuild_bytes_file(byte_dir)
+        self.load_rules()
+
+
+    def load_rules(self):
+        """Load suricata rules from the core byte file.
+        """
+        rules = {}
+        json_data = get_json(self.bytes_file)
+        for traffic_type, contents in json_data.iteritems():
+            name = contents.get("name", traffic_type)
+            target = contents.get("target", None)
+            if target is None:
+                log.warn("Suricata rule {0} does not have a target.".format(name) +
+                         " It will not be added to the available Suricata rules")
+                continue
+            byte_sequences = contents.get("byte_sequences", [])
+            for sequence in byte_sequences:
+                action = sequence.get("action", None)
+                if action is None:
+                    continue
+                log.debug("adding target {0} to action {1}".format(action, target))
+                rules.setdefault(action, set()).add(target)
+        self.rules = rules
+
+    def rebuild_bytes_file(self, byte_dir):
+        """Rebuilds the core byte file from files in the byte snippet directory.
+
+        Args:
+            byte_dir (str): The path to the byte snippet directory.
+
+        """
+        combined_bytes = {}
+        for byte_snippet in os.listdir(byte_dir):
+            if byte_snippet.endswith(".json"):
+                json_data = get_json(os.path.join(byte_dir, byte_snippet))
+                for traffic_type, contents in json_data.iteritems():
+                    # This base will not overwrite values
+                    combined_bytes.setdefault(traffic_type, {})
+                    for key, value in contents.iteritems():
+                        if type(key) == list:
+                            # This is our byte_sequences list
+                            for byte_rule in value:
+                                # Write all rule dicts in the byte sequence array
+                                combined_bytes[traffic_type].setdefault(key, []).append(byte_rule)
+                        else:
+                            combined_bytes[traffic_type].setdefault(key, value)
+        with open(self.bytes_file, "w+") as byte_file:
+            # Pretty print the dictionary to the JSON bytes file
+            json.dump(combined_bytes, byte_file, sort_keys=True, indent=4, separators=(',', ': '))
+            log.debug("rule file created containing the following rules {0}".format(combined_bytes))
 
 def ascii_byte_to_socrata_seq(byte_seq):
     """
@@ -149,7 +212,8 @@ def make_rules(rule_set):
     """
     rules = {}
     for traffic_type, contents in rule_set.items():
-        name = contents.get("name", str(uuid4())[-12:])
+        name = contents.get("name", traffic_type)
+        target = contents.get("target", None)
         byte_sequences = contents.get("byte_sequences", [])
 
         for sequence in byte_sequences:
@@ -177,8 +241,8 @@ class ConfigWriter(Config):
         super(ConfigWriter, self).__init__()
         self.config_type = "suricata"
         plugin_dir = os.environ['COPILOT_PLUGINS_DIRECTORY']
-        self.rule_path = os.path.abspath(os.path.join(plugin_dir,
-                                                       "plugins/suricata/byte_dict.json"))
+        self.config_directory = "/tmp/copilot/"
+        self.rule_path = self.bytes_file = os.path.join(self.config_directory, "suricata_raw_rules")
         self.load_rules()
         self.header = ("# This Suricata rules file is AUTOMATICALLY GENERATED.\n" +
                        "# This file was created by the copilot suricata plugin.\n" +

@@ -1,4 +1,5 @@
 from copilot.models.config import Config
+from copilot.models.config import PluginOptions
 from exceptions import ValueError
 import subprocess
 import re
@@ -10,6 +11,18 @@ import logging
 log = logging.getLogger(__name__)
 
 import string
+
+class Plugin(PluginOptions):
+
+    def __init__(self):
+        super(PluginOptions, self).__init__()
+        log.debug("Initializing create ap plugin.")
+        self.rules = None
+        self.name = "create_ap"
+        self.has_subtarget = False
+        self.config_directory = "/tmp/copilot/"
+        self.config_file = "ap.conf"
+        self.config_path = path.join(self.config_directory, self.config_file)
 
 class ConfigWriter(Config):
 
