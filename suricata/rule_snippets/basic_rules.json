@@ -25,18 +25,21 @@
         ]},
     "JPEG" : {
         "name":"JPEG",
+        "target":"JPEG",
         "byte_sequences" : [
             {"rule_type":"raw rule",
              "action":"block",
              "rule":"reject http any any -> any any (msg:\"FILEEXT JPG file claimed\"; fileext:\"jpg\"; sid:1; rev:1;)"}]},
     "BMP" : {
         "name":"BMP",
+        "target":"BMP",
         "byte_sequences" : [
             {"rule_type":"raw rule",
              "action":"block",
              "rule":"reject http any any -> any any (msg:\"FILEEXT BMP file claimed\"; fileext:\"bmp\"; sid:3; rev:1;)"}]},
     "Facebook Chat" : {
         "name":"Facebook Chat",
+        "target":"Facebook Chat",
         "byte_sequences" : [
             {"rule_type":"raw rule",
              "action":"block",
