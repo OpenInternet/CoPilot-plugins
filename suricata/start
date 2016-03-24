@@ -66,13 +66,14 @@ kill_current_suricata() {
         fi
         echo "No PID file found at ${PID_FILE}"
     fi
-
-    echo "Removing rule file"
-    rm "${SURICATA_RULES}"
 }
 
 clean_up() {
     echo "Cleaning up after Suricata plugin."
+
+    echo "Removing rule file"
+    rm "${SURICATA_RULES}"
+
     kill_current_suricata
     exit 0
 }
