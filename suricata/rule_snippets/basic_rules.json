@@ -1,0 +1,43 @@
+{
+    "HTTP" : {
+        "name":"HTTP",
+        "target":"HTTP",
+        "byte_sequences" : [
+            {"rule_type":"raw rule",
+             "action":"block",
+             "rule":"reject http any any -> any any (msg:\"COPILOT - HTTP Packet Detected\"; app-layer-protocol:http; sid:2127109; rev:1;)"}
+        ]},
+    "HTTPS" : {
+        "name":"HTTPS",
+        "target":"HTTPS",
+        "byte_sequences" : [
+            {"rule_type":"raw rule",
+             "action":"block",
+             "rule":"reject tcp any any -> any 443 (msg:\"COPILOT - HTTPS Packet Detected\"; flow:established; app-layer-protocol:tls; sid:2271019; rev:1;)"}
+        ]},
+    "TLS" : {
+        "name":"TLS",
+        "target":"TLS",
+        "byte_sequences" : [
+            {"rule_type":"raw rule",
+             "action":"block",
+             "rule":"reject tcp any any -> any any (msg:\"COPILOT - TLS Packet Detected\"; flow:established; app-layer-protocol:tls; sid:2271019; rev:1;)"}
+        ]},
+    "JPEG" : {
+        "name":"JPEG",
+        "byte_sequences" : [
+            {"rule_type":"raw rule",
+             "rule":"reject http any any -> any any (msg:\"FILEEXT JPG file claimed\"; fileext:\"jpg\"; sid:1; rev:1;)"}]},
+    "BMP" : {
+        "name":"BMP",
+        "byte_sequences" : [
+            {"rule_type":"raw rule",
+             "rule":"reject http any any -> any any (msg:\"FILEEXT BMP file claimed\"; fileext:\"bmp\"; sid:3; rev:1;)"}]},
+    "Facebook Chat" : {
+        "name":"Facebook Chat",
+        "byte_sequences" : [
+            {"rule_type":"raw rule",
+             "rule":"reject tcp $HOME_NET any -> $EXTERNAL_NET $HTTP_PORTS (msg:\"ET CHAT Facebook Chat (send message)\"; flow:established,to_server; content:\"POST\"; http_method; content:\"facebook.com\"; http_uri; content:\"/ajax/chat/send.php\"; http_uri; distance:0; reference:url,doc.emergingthreats.net/2010784; classtype:policy-violation; sid:2010784; rev:4;)"},
+            {"rule_type":"raw rule",
+             "rule":"reject tcp $HOME_NET any -> $EXTERNAL_NET $HTTP_PORTS (msg:\"ET CHAT Facebook Chat (send message)\"; flow:established,to_server; content:\"POST\"; http_method; content:\"/ajax/chat/send.php\"; http_uri; content:\"facebook.com\"; http_header; reference:url,doc.emergingthreats.net/2010784; classtype:policy-violation; sid:2010784; rev:3;)"}]}
+}
