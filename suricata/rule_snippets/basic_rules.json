@@ -1,0 +1,54 @@
+{
+    "HTTP" : {
+        "name":"HTTP",
+        "target":"HTTP",
+        "byte_sequences" : [
+            {"rule_type":"raw rule",
+             "action":"block",
+             "rule":"reject http any any -> any any (msg:\"COPILOT - HTTP Packet Detected\"; sid:2127109; rev:1;)"}
+        ]},
+    "HTTPS" : {
+        "name":"HTTPS",
+        "target":"HTTPS",
+        "byte_sequences" : [
+            {"rule_type":"raw rule",
+             "action":"block",
+             "rule":"reject tcp any any -> any 443 (msg:\"COPILOT - HTTPS Packet Detected\"; flow:established; app-layer-protocol:tls; sid:2271019; rev:1;)"}
+        ]},
+    "TLS" : {
+        "name":"TLS",
+        "target":"TLS",
+        "byte_sequences" : [
+            {"rule_type":"raw rule",
+             "action":"block",
+             "rule":"reject ip any any -> any any (msg:\"COPILOT - TLS Packet Detected\"; flow:established; app-layer-protocol:tls; sid:2271019; rev:1;)"}
+        ]},
+    "JPEG" : {
+        "name":"JPEG",
+        "target":"JPEG",
+        "byte_sequences" : [
+            {"rule_type":"raw rule",
+             "action":"block",
+             "rule":"reject http any any -> any any (msg:\"COPILOT - Blocked JPG\"; fileext:\"jpg\"; sid:1; rev:1;)"}]},
+    "BMP" : {
+        "name":"BMP",
+        "target":"BMP",
+        "byte_sequences" : [
+            {"rule_type":"raw rule",
+             "action":"block",
+             "rule":"reject http any any -> any any (msg:\"COPILOT - Blocked BMP\"; fileext:\"bmp\"; sid:3; rev:1;)"}]}
+    "GIF" : {
+        "name":"GIF",
+        "target":"GIF",
+        "byte_sequences" : [
+            {"rule_type":"raw rule",
+             "action":"block",
+             "rule":"reject http any any -> any any (msg:\"COPILOT - Blocked GIF \"; fileext:\"gif\"; sid:3; rev:1;)"}]},
+    "PDF" : {
+        "name":"PDF",
+        "target":"PDF",
+        "byte_sequences" : [
+            {"rule_type":"raw rule",
+             "action":"block",
+             "rule":"reject http any any -> any any (msg:\"COPILOT - Blocked PDF \"; fileext:\"pdf\"; sid:3; rev:1;)"}]}
+}
