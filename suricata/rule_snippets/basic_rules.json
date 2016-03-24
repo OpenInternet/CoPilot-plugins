@@ -29,22 +29,26 @@
         "byte_sequences" : [
             {"rule_type":"raw rule",
              "action":"block",
-             "rule":"reject http any any -> any any (msg:\"FILEEXT JPG file claimed\"; fileext:\"jpg\"; sid:1; rev:1;)"}]},
+             "rule":"reject http any any -> any any (msg:\"COPILOT - Blocked JPG\"; fileext:\"jpg\"; sid:1; rev:1;)"}]},
     "BMP" : {
         "name":"BMP",
         "target":"BMP",
         "byte_sequences" : [
             {"rule_type":"raw rule",
              "action":"block",
-             "rule":"reject http any any -> any any (msg:\"FILEEXT BMP file claimed\"; fileext:\"bmp\"; sid:3; rev:1;)"}]},
-    "Facebook Chat" : {
-        "name":"Facebook Chat",
-        "target":"Facebook Chat",
+             "rule":"reject http any any -> any any (msg:\"COPILOT - Blocked BMP\"; fileext:\"bmp\"; sid:3; rev:1;)"}]}
+    "GIF" : {
+        "name":"GIF",
+        "target":"GIF",
         "byte_sequences" : [
             {"rule_type":"raw rule",
              "action":"block",
-             "rule":"reject tcp $HOME_NET any -> $EXTERNAL_NET $HTTP_PORTS (msg:\"ET CHAT Facebook Chat (send message)\"; flow:established,to_server; content:\"POST\"; http_method; content:\"facebook.com\"; http_uri; content:\"/ajax/chat/send.php\"; http_uri; distance:0; reference:url,doc.emergingthreats.net/2010784; classtype:policy-violation; sid:2010784; rev:4;)"},
+             "rule":"reject http any any -> any any (msg:\"COPILOT - Blocked GIF \"; fileext:\"gif\"; sid:3; rev:1;)"}]},
+    "PDF" : {
+        "name":"PDF",
+        "target":"PDF",
+        "byte_sequences" : [
             {"rule_type":"raw rule",
              "action":"block",
-             "rule":"reject tcp $HOME_NET any -> $EXTERNAL_NET $HTTP_PORTS (msg:\"ET CHAT Facebook Chat (send message)\"; flow:established,to_server; content:\"POST\"; http_method; content:\"/ajax/chat/send.php\"; http_uri; content:\"facebook.com\"; http_header; reference:url,doc.emergingthreats.net/2010784; classtype:policy-violation; sid:2010784; rev:3;)"}]}
+             "rule":"reject http any any -> any any (msg:\"COPILOT - Blocked PDF \"; fileext:\"pdf\"; sid:3; rev:1;)"}]}
 }
