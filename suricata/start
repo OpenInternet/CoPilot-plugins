@@ -28,6 +28,9 @@ start_suricata() {
 }
 
 kill_current_suricata() {
+    echo "cleaning up iptables"
+    iptables -D ${IPTABLE_RULE}
+
     echo "Killing existing suricata process."
     if [[ -f "${PID_FILE}" ]]; then
         echo "PID file ${PID_FILE} not found"
@@ -63,12 +66,14 @@ kill_current_suricata() {
         fi
         echo "No PID file found at ${PID_FILE}"
     fi
+
+    echo "Removing rule file"
+    rm "${SURICATA_RULES}"
 }
 
 clean_up() {
     echo "Cleaning up after Suricata plugin."
     kill_current_suricata
-    iptables -D ${IPTABLE_RULE}
     exit 0
 }
 
