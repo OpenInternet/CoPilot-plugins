@@ -36,7 +36,7 @@
         "byte_sequences" : [
             {"rule_type":"raw rule",
              "action":"block",
-             "rule":"reject http any any -> any any (msg:\"COPILOT - Blocked BMP\"; fileext:\"bmp\"; sid:3; rev:1;)"}]}
+             "rule":"reject http any any -> any any (msg:\"COPILOT - Blocked BMP\"; fileext:\"bmp\"; sid:3; rev:1;)"}]},
     "GIF" : {
         "name":"GIF",
         "target":"GIF",
