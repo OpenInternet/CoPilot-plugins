@@ -64,6 +64,10 @@ class ConfigWriter(Config):
         self._rules.append("{0} ".format(ap_name))
         self._rules.append("{0} ".format(ap_password))
 
+    def delete_config(self):
+        """create ap should not have its config file deleted when profiles change."""
+        pass
+
     def get_wireless_interface(self):
         log.debug("Obtaining wireless interface")
         iface_out = None
