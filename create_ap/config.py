@@ -68,10 +68,16 @@ class ConfigWriter(Config):
         log.debug("Obtaining wireless interface")
         iface_out = None
         name_regex = self.get_interface_regex("wlan")
+        fallback_name_regex = re.compile('w[a-z]{1,3}[0-9]')
         try:
             iface_out = self.get_proc_wifi_interface(name_regex)
         except RuntimeError:
             iface_out = self.get_sys_wifi_interface(name_regex)
+        if iface_out == None:
+            try:
+                iface_out = self.get_proc_wifi_interface(fallback_name_regex)
+            except RuntimeError:
+                iface_out = self.get_sys_wifi_interface(fallback_name_regex)
         if iface_out == None:
             raise RuntimeError("Unable to identify wireless interface.")
         else:
