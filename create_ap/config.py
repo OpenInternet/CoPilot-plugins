@@ -64,20 +64,37 @@ class ConfigWriter(Config):
         self._rules.append("{0} ".format(ap_name))
         self._rules.append("{0} ".format(ap_password))
 
+    def get_wifi_iface_from_systems(self, regex):
+        iface = None
+        if iface is None:
+            try:
+                iface_out = self.get_proc_wifi_interface(name_regex)
+            except RuntimeError:
+                iface_out = self.get_sys_wifi_interface(name_regex)
+        if iface is None:
+            try:
+                iface_out = self.get_sys_wifi_interface(name_regex)
+            except RuntimeError:
+                iface_out = self.get_sys_wifi_interface(name_regex)
+
+
     def get_wireless_interface(self):
         log.debug("Obtaining wireless interface")
         iface_out = None
-        name_regex = self.get_interface_regex("wlan")
+        new_name_regex = self.get_interface_regex("wlan")
         fallback_name_regex = re.compile('w[a-z]{1,3}[0-9]')
-        try:
-            iface_out = self.get_proc_wifi_interface(name_regex)
-        except RuntimeError:
-            iface_out = self.get_sys_wifi_interface(name_regex)
-        if iface_out == None:
-            try:
-                iface_out = self.get_proc_wifi_interface(fallback_name_regex)
-            except RuntimeError:
-                iface_out = self.get_sys_wifi_interface(fallback_name_regex)
+        name_regexes = [fallback_name_regex, new_name_regex]
+        for name_regex in name_regexes:
+            if iface_out is None:
+                try:
+                    iface_out = self.get_proc_wifi_interface(name_regex)
+                except RuntimeError:
+                    log.debug("Unable to identify wireless interface from proc.")
+            if iface_out is None:
+                try:
+                    iface_out = self.get_sys_wifi_interface(name_regex)
+                except RuntimeError:
+                    log.debug("Unable to identify wireless interface from sys.")
         if iface_out == None:
             raise RuntimeError("Unable to identify wireless interface.")
         else:
