@@ -33,6 +33,7 @@ class Plugin(PluginOptions):
     def load_rules(self):
         """Load suricata rules from the core byte file.
         """
+        log.debug("Loading JSON rule files.")
         rules = {}
         json_data = get_json(self.bytes_file)
         for traffic_type, contents in json_data.iteritems():
@@ -58,6 +59,7 @@ class Plugin(PluginOptions):
             byte_dir (str): The path to the byte snippet directory.
 
         """
+        log.debug("Rebuilding core byte file.")
         combined_bytes = {}
         for byte_snippet in os.listdir(byte_dir):
             if byte_snippet.endswith(".json"):
@@ -122,6 +124,7 @@ def build_adversary_rules(name, sequence):
         {'name':'', 'flow_name':'', 'byte_seq':'', 'sid':''}
     in_rule (dict): A dictionary containing information about the incoming packet that responds to the initial outgoing packet in a stream to block.
     """
+    log.debug("Building Adversary rules.")
     out_rule = {}
     out_rule['byte_seq'] = ascii_byte_to_socrata_seq(sequence['outgoing'])
     out_rule['name'] = name
@@ -192,6 +195,7 @@ def build_adversary_rules(name, sequence):
 
 def get_json(json_path):
     """Get json data from a file."""
+    log.debug("Attempting to load byte file {0}.".format(json_path))
     with open(json_path, "r") as json_file:
         try:
             json_data = json.load(json_file)
@@ -201,6 +205,7 @@ def get_json(json_path):
     return json_data
 
 def load_rules(rule_path, rule_name):
+    log.debug("Attempting to load rules from file {0}.".format(rule_path))
     json_data = get_json(rule_path)
     rules = make_rules(json_data)
 
@@ -210,6 +215,7 @@ def make_rules(rule_set):
     Args:
         rule_set (dict): Adversary lab rule sets json translated into a dictionary.
     """
+    log.debug("Creating suricata rule dictionary")
     rules = {}
     for traffic_type, contents in rule_set.items():
         name = contents.get("name", traffic_type)
