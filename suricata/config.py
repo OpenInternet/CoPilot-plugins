@@ -196,7 +196,7 @@ def get_json(json_path):
         try:
             json_data = json.load(json_file)
         except ValueError as _e:
-            log.error("JSON is incorrectly formatted. Could not be loaded.")
+            log.error("JSON is incorrectly formatted. {0} could not be loaded.".format(json_path))
             raise ValueError(_e)
     return json_data
 
