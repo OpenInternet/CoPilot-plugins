@@ -77,6 +77,9 @@ class ConfigWriter(Config):
             except RuntimeError:
                 iface_out = self.get_sys_wifi_interface(name_regex)
 
+    def delete_config(self):
+        """create ap should not have its config file deleted when profiles change."""
+        pass
 
     def get_wireless_interface(self):
         """ Gets the name of the wireless interface."""
