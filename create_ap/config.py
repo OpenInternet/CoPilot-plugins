@@ -79,9 +79,11 @@ class ConfigWriter(Config):
 
 
     def get_wireless_interface(self):
+        """ Gets the name of the wireless interface."""
         log.debug("Obtaining wireless interface")
         iface_out = None
         new_name_regex = self.get_interface_regex("wlan")
+        # Kali only runs bleeding edge so iface naming is in flux
         fallback_name_regex = re.compile('w[a-z]{1,3}[0-9]')
         name_regexes = [fallback_name_regex, new_name_regex]
         for name_regex in name_regexes:
