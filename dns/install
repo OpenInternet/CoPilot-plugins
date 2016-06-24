@@ -3,9 +3,17 @@
 set -e
 set -x
 
+readonly SETUP_DIR=/tmp/setup
+
 install_DNS_tools() {
     #Install DNSChef tool
-    apt-get -y install dnschef
+    mkdir -p $SETUP_DIR
+    git clone https://github.com/iphelix/dnschef.git "${SETUP_DIR}"/dnschef
+    cd "${SETUP_DIR}"/dnschef
+    apt-get -y install python-dns
+    pip install dnslib
+    pip install IPy
+    cp dnschef.py /usr/bin/dnschef
 }
 
 setup_DNS_tools() {
