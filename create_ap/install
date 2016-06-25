@@ -8,6 +8,7 @@ readonly COPILOT_DIR=/home/www/copilot
 
 
 install_create_ap_deps() {
+    get_wifi_drivers
     # Dependencies for create_ap
     apt-get -y install hostapd
     apt-get -y install build-essential
@@ -24,6 +25,20 @@ install_create_ap() {
     #install create ap
     make install
     cd "$COPILOT_DIR"
+}
+
+get_wifi_drivers() {
+    if grep -q "contrib non-free" "/etc/apt/sources.list"
+    then
+        echo "Sources already non-free. Skipping..."
+    else
+        sed -i 's/jessie main/jessie main contrib non-free/' "/etc/apt/sources.list"
+        apt-get update
+    fi
+    apt-get -y install firmware-atheros
+    modprobe ath9k_htc
+    apt-get -y install iw
+    apt-get -y install dnsmasq
 }
 
 main() {
