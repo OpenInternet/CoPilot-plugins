@@ -30,6 +30,7 @@ build_dnschef() {
 }
 
 setup_DNS_tools() {
+    update-rc.d dnsmasq disable
     #Make our localhost the only nameserver used
     echo "supersede domain-name-servers 127.0.0.1;" >> /etc/dhcp/dhclient.conf
 }
