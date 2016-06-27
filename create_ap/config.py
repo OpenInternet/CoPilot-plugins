@@ -54,9 +54,11 @@ class ConfigWriter(Config):
         else:
             raise ValueError("Access Point names must be between 1 and 31 characters long.")
 
-    def add_rule(self, ap_name="copilot", ap_password="copilot_pass", iface_in="eth0", iface_out=None):
+    def add_rule(self, ap_name="copilot", ap_password="copilot_pass", iface_in=None, iface_out=None):
         log.info("Adding access point configuration")
-        if not iface_out:
+        if iface_in is None:
+            iface_in = self.get_ethernet_interface()
+        if iface_out is None:
             iface_out = self.get_wireless_interface()
         log.debug("adding create ap rule  {0} {1} {2} {3}".format(iface_out, iface_in, ap_name, ap_password))
         self._rules.append("{0} ".format(iface_out))
@@ -64,7 +66,43 @@ class ConfigWriter(Config):
         self._rules.append("{0} ".format(ap_name))
         self._rules.append("{0} ".format(ap_password))
 
-    def get_wifi_iface_from_systems(self, regex):
+    def get_ethernet_interface(self):
+        """ Gets the name of the ethernet interface."""
+        log.debug("Obtaining ethernet  interface")
+        iface_in = None
+        new_name_regex = self.get_interface_regex("eth")
+        # Kali only runs bleeding edge so iface naming is in flux
+        fallback_name_regex = re.compile('e[a-z]{1,3}[0-9]')
+        name_regexes = [fallback_name_regex, new_name_regex]
+        for name_regex in name_regexes:
+            if iface_in is None:
+                try:
+                    iface_in = self.get_sys_eth_interface(name_regex)
+                except RuntimeError:
+                    log.debug("Unable to identify ethernet interface from sys.")
+        if iface_in == None:
+            raise RuntimeError("Unable to identify ethernet interface.")
+        else:
+            return iface_in
+
+    def get_sys_eth_interface(self, device_regex):
+        log.debug("Searching for ethernet interface in /sys/class/net.")
+        ifaces = []
+        net_iface_root = "/sys/class/net"
+        iface_directories = os.listdir(net_iface_root)
+        for iface_dir in iface_directories:
+            try:
+                ifaces.append(device_regex.search(iface_dir).group())
+            except AttributeError:
+                pass
+        if ifaces == []:
+            interface_not_found_message = "No ethernet interfaces found in /sys/class/net."
+            log.warn(interface_not_found_message)
+            raise RuntimeError(interface_not_found_message)
+        # We only return the first interface found
+        return ifaces[0]
+
+    def get_wifi_iface_from_systems(self, name_regex):
         iface = None
         if iface is None:
             try:
