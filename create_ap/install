@@ -36,7 +36,9 @@ get_wifi_drivers() {
         apt-get update
     fi
     apt-get -y install firmware-atheros
-    modprobe ath9k_htc
+    # Cannot use modprobe directly because we are in a virtual env
+    echo "ath9k_htc" >> /etc/modules-load.d/wireless_mods.conf
+    #modprobe ath9k_htc
     apt-get -y install iw
     apt-get -y install dnsmasq
 }
