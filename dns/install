@@ -3,19 +3,41 @@
 set -e
 set -x
 
+readonly SETUP_DIR=/tmp/setup
+
 install_DNS_tools() {
-    #Install DNSChef tool
-    apt-get -y install dnschef
+    # Install Dependencies
+    apt-get -y install python-dns
+    pip install dnslib
+    pip install IPy
+    build_dnschef
+}
+
+build_dnschef() {
+    # http://docs.kali.org/development/rebuilding-a-package-from-source
+    # Build and Install DNSChef tool from Kali Source
+    mkdir -p $SETUP_DIR
+    git clone git://git.kali.org/packages/dnschef.git "${SETUP_DIR}"/dnschef
+    cd "${SETUP_DIR}"/dnschef
+    apt-get -y install debhelper
+    # dpkg-buildpackage options
+    # -b         = binary only
+    # -rfakeroot = use fake root
+    # -us        = do not sign the source
+    # -uc        = do not sign the changes file
+    dpkg-buildpackage -b -rfakeroot -us -uc
+    dpkg -i ../dnschef*.deb
 }
 
 setup_DNS_tools() {
+    update-rc.d dnsmasq disable
     #Make our localhost the only nameserver used
     echo "supersede domain-name-servers 127.0.0.1;" >> /etc/dhcp/dhclient.conf
 }
 
 main() {
-       install_DNS_tools
-       setup_DNS_tools
+    install_DNS_tools
+    setup_DNS_tools
 }
 
 main
