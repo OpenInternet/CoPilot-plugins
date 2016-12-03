@@ -49,10 +49,12 @@ class ConfigWriter(Config):
 
     @ap_name.setter
     def ap_name(self, name):
-        if 0 < len(str(name)) <= 31:
-            self._ap_name = name
-        else:
+        if (len(str(name)) <= 0 or len(str(name)) >= 31):
             raise ValueError("Access Point names must be between 1 and 31 characters long.")
+        elif re.findall("\s", name):
+            raise ValueError("Name cannot contain any spaces or tabs.")
+        else:
+            self._ap_name = name
 
     def add_rule(self, ap_name="copilot", ap_password="copilot_pass", iface_in=None, iface_out=None):
         log.info("Adding access point configuration")
